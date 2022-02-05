@@ -60,9 +60,8 @@ foreach ($candidates as [$a, $b]) {
 Creating an instance of the LSH class can be configured as follows:
 
 ```php
-
 // The LSH constructor. 
-use PhpLsh\Shingle\BasicCharacterTokenizer;use PhpLsh\Shingle\WordTokenizer;public function __construct(
+public function __construct(
     // Determines how the input strings are tokenized (shingled). By default
     // we use a character based tokenizer.
     private TokenizerInterface $tokenizer,
@@ -83,7 +82,7 @@ $characterTokenizer->tokenize("Hello", 2);
 // The word based tokenizer accepts a list of stopwords. Recommended:
 // composer require voku/stop-words
 // $stopWords = (new StopWords())->getStopWordsFromLanguage('en');
-$wordTokenizer = new WordTokenizer(['list', 'of', 'stopword']);
+$wordTokenizer = new WordTokenizer(['list', 'of', 'stopwords']);
 $wordTokenizer->tokenize("The quick brown fox", 2);
 // Output: ["The quick", "quick brown", "brown fox"]
 
