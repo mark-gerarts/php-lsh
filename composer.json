@@ -1,0 +1,24 @@
+{
+    "name": "mark-gerarts/php-lsh",
+    "description": "Locality-Sensitive Hashing implementation in PHP",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mark Gerarts",
+            "email": "mark.gerarts@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "PhpLsh\\": "src"
+        }
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^6.0",
+        "phpunit/phpunit": "^9.5"
+    },
+    "require": {
+        "webmozart/assert": "^1.10"
+    }
+}
