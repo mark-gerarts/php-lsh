@@ -3,10 +3,10 @@
 This implementation was created as a way to enhance my understanding of  LSH and 
 mainly as something fun to do. I highly doubt this scales well.
 
-1. [The theory](locality-sensitive-hashing-the-theory)
-2. [Usage](usage)
-3. [Example](example)
-4. [Tests](tests)
+1. [The theory](#locality-sensitive-hashing-the-theory)
+2. [Usage](#usage)
+3. [Example](#example)
+4. [Tests](#tests)
 
 ## Locality-Sensitive Hashing: the theory
 
