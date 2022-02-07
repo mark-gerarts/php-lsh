@@ -7,6 +7,7 @@ use PhpLsh\MinHash\HashInterface;
 use PhpLsh\MinHash\MinHash;
 use PhpLsh\Shingle\BasicCharacterTokenizer;
 use PhpLsh\Shingle\TokenizerInterface;
+use PhpLsh\Util\ArrayUtil;
 
 class LSH
 {
@@ -97,29 +98,26 @@ class LSH
     private function countPairs(array $buckets): array
     {
         $matchingBandCounts = [];
-
-        foreach ($buckets as $bucket) {
-            foreach ($bucket as $matchingItems) {
+        foreach ($buckets as $bandBuckets) {
+            foreach ($bandBuckets as $matchingItems) {
                 if (count($matchingItems) < 2) {
                     continue;
                 }
 
-                // @todo:
-                // Generate pairs here because there can be more than 2 matching
-                // items in a bucket.
                 sort($matchingItems);
-                [$a, $b] = $matchingItems;
-                if (!isset($matchingBandCounts[$a])) {
-                    $matchingBandCounts[$a] = [];
-                }
-                if (!isset($matchingBandCounts[$a][$b])) {
-                    $matchingBandCounts[$a][$b] = 0;
-                }
+                $pairs = ArrayUtil::pairs($matchingItems);
+                foreach ($pairs as [$a, $b]) {
+                    if (!isset($matchingBandCounts[$a])) {
+                        $matchingBandCounts[$a] = [];
+                    }
+                    if (!isset($matchingBandCounts[$a][$b])) {
+                        $matchingBandCounts[$a][$b] = 0;
+                    }
 
-                $matchingBandCounts[$a][$b]++;
+                    $matchingBandCounts[$a][$b]++;
+                }
             }
         }
-
 
         return $matchingBandCounts;
     }

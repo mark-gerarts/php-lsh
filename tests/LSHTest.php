@@ -42,4 +42,38 @@ final class LSHTest extends TestCase
 
         $this->assertTrue($equalCount >= 9);
     }
+
+    public function testItCanDetectMoreThanTwoSimilarCandidates(): void
+    {
+        $inputs = [
+            'The quick brown fox jumps over the lazy dog. Sphinx of black quartz, judge my vow. The five boxing wizards jump quickly.',
+            'Ages come and pass, leaving memories that become legend. Legend fades to myth, and even myth is long forgotten when the Age that gave it birth comes again.',
+            'Occaecati dolorem sapiente qui blanditiis occaecati ut et eveniet. Totam laboriosam quod sint molestiae. Eligendi aliquam et est est. Blanditiis quo deleniti quidem perferendis sed.',
+            'The cunning brown fox jumps over the lazy dog. Sphinx of black quartz, judge my vow. The five boxing wizards jump quickly.',
+            'The sly brown fox jumps over the lazy dog. Sphinx of black quartz, judge my vow. The five boxing wizards jump quickly.'
+        ];
+
+        $isExpected = function (array $candidates): bool {
+            $matchingCount = 0;
+            $expectedPairs = [[0, 3], [0, 4], [3, 4]];
+            foreach ($candidates as $candidate) {
+                if (in_array($candidate, $expectedPairs, true)) {
+                    $matchingCount++;
+                }
+            }
+
+            return $matchingCount === 3;
+        };
+
+        $equalCount = 0;
+        for ($i = 0; $i < 10; $i++) {
+            $lsh = LSH::createWithDefaults();
+            $candidates = $lsh->findCandidateItems($inputs);
+            if ($isExpected($candidates)) {
+                $equalCount++;
+            }
+        }
+
+        $this->assertTrue($equalCount >= 8);
+    }
 }
