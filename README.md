@@ -54,10 +54,10 @@ achieve this by applying *min-hashing*.
 
 To create a min-hash of a document, we do the following:
 
-1. Create a number of independent hash functions $h_1, h_2, \ldots, h_n$. These
+1. Create a number of independent hash functions *H1*, *H2*, ..., *Hn*. These
    are the same for every document.
 2. Extract all shingles from the document
-3. For each hash function $h_i$ do:
+3. For each hash function *Hi* do:
    1. Hash every shingle
    2. Append the minimal hash to the min-hash vector
 
@@ -79,13 +79,12 @@ positives.
 
 In order to minimize the false positive and false negative results, we do not
 simply hash the entire min-hash vector, but instead apply the *banding
-technique*. Each min-hash vector gets divided in $b$ bands of $r$ rows each. We
+technique*. Each min-hash vector gets divided in *b* bands of *r* rows each. We
 then hash every band separately. Two documents are considered candidate items if
-the fraction of bands that hash to the same bucket is above some threshold $t$.
+the fraction of bands that hash to the same bucket is above some threshold *t*.
 
-To achieve the best results, you should pick $b$ and $r$ in such a way that $t
-\approx (\frac{1}{b})^{(\frac{1}{r})}$. This process is explained in more detail
-in section 3.4 of MMDS.
+To achieve the best results, you should pick *b* and *r* in such a way that *t ~
+(1/b)^(1/r)*. This process is explained in more detail in section 3.4 of MMDS.
 
 ## Usage
 
