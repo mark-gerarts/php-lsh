@@ -1,6 +1,6 @@
 # Near-neighbour search using Locality-Sensitive Hashing (LSH), implemented in PHP
 
-This implementation was created as a way to enhance my understanding of  LSH and 
+This implementation was created as a way to enhance my understanding of LSH and
 mainly as something fun to do. I highly doubt this scales well.
 
 1. [The theory](#locality-sensitive-hashing-the-theory)
@@ -10,18 +10,82 @@ mainly as something fun to do. I highly doubt this scales well.
 
 ## Locality-Sensitive Hashing: the theory
 
-The implementation is based on the theory from 
-[Mining of Massive Datasets](http://www.mmds.org/), specifically 
-[Chapter 3](http://infolab.stanford.edu/~ullman/mmds/ch3n.pdf). We will only go 
+The implementation is based on the theory from
+[Mining of Massive Datasets](http://www.mmds.org/), specifically
+[Chapter 3](http://infolab.stanford.edu/~ullman/mmds/ch3n.pdf). We will only go
 over the basic ideas here.
 
 LSH consists of three steps:
 
 1. Shingling
-2. Minhashing
+2. Min-hashing
 3. LSH
 
-@todo
+### Shingling
+
+*Shingling* converts documents to sets while still taking the ordering of words
+into account. This works better for similarity checking than for example simply
+taking the set of words that appear in the document.
+
+To shingle a document we take a "sliding window" of *k-shingles* (k-gram, ngram)
+of tokens. A token can be anything: characters, words, sentences, ...
+
+For example, if we want to take word-shingles of length 2 of the following
+sentence:
+
+> The quick brown fox jumps over the lazy dog
+
+The resulting set of shingles would be: "The quick", "quick brown", "brown fox",
+"fox jumps", "jumps over", "over the", "the lazy", "lazy dog".
+
+Or character-based shingles of length 3 of the string "example": "exa", "xam",
+"amp", "mpl", "ple".
+
+You can tweak this process in many ways, for example by ignoring stopwords or
+punctuation. A more exotic alternative only takes into account the first *k*
+words following a stopword.
+
+### Min-hashing
+
+Shingling a document results in a large set of shingles for long documents. To
+preserve memory, we are interested in some way to compress the sets while still
+maintaining similarity characteristics between pairs of documents. We can
+achieve this by applying *min-hashing*.
+
+To create a min-hash of a document, we do the following:
+
+1. Create a number of independent hash functions $h_1, h_2, \ldots, h_n$. These
+   are the same for every document.
+2. Extract all shingles from the document
+3. For each hash function $h_i$ do:
+   1. Hash every shingle
+   2. Append the minimal hash to the min-hash vector
+
+The result of this is a vector with a length equal to the number of hash
+functions used. For further details on *why* this is a good way to compress sets
+while maintaining similarity, we refer to section 3.3 of MMDS.
+
+### LSH
+
+We now have a list of min-hash vectors, one for each document. Even with the
+smaller memory footprint, it is still time-consuming to compare every pair of
+min-hashes for large sets of documents.
+
+The basic idea of LSH is to apply a hash function to every min-hash and see
+which vectors get hashed to the same bucket. These will be your candidate items:
+items with a high probability of being similar. Normally you then do a second
+pass where you actually compare the candidates to filter out any false
+positives.
+
+In order to minimize the false positive and false negative results, we do not
+simply hash the entire min-hash vector, but instead apply the *banding
+technique*. Each min-hash vector gets divided in $b$ bands of $r$ rows each. We
+then hash every band separately. Two documents are considered candidate items if
+the fraction of bands that hash to the same bucket is above some threshold $t$.
+
+To achieve the best results, you should pick $b$ and $r$ in such a way that $t
+\approx (\frac{1}{b})^{(\frac{1}{r})}$. This process is explained in more detail
+in section 3.4 of MMDS.
 
 ## Usage
 
@@ -60,7 +124,7 @@ foreach ($candidates as [$a, $b]) {
 Creating an instance of the LSH class can be configured as follows:
 
 ```php
-// The LSH constructor. 
+// The LSH constructor.
 public function __construct(
     // Determines how the input strings are tokenized (shingled). By default
     // we use a character based tokenizer.
@@ -88,7 +152,7 @@ $wordTokenizer->tokenize("The quick brown fox", 2);
 
 // Generating MinHash signatures of length 50. Basic hash functions are used,
 // see PhpLsh\MinHash\BasicHash.
-$minhash = MinHash::createBasicOfLength(50); 
+$minhash = MinHash::createBasicOfLength(50);
 // Customizing the hashfunctions. The number of hash functions equals the length
 // of the signature.
 $minhash = new MinHash([$hashFunction1, $hashFunction1, ...])
@@ -111,7 +175,7 @@ public function findCandidateItems(
     iterable $inputs,
     // The number of bands and rows to split the minhash signatures in. Keep in
     // mind that b.r=n is a hard requirement, with n being the minhash signature
-    // length. 
+    // length.
     int $numberOfBands = 5,
     int $numberOfRows = 20,
     // How similar two items have to be in order to be considered candidates.
@@ -124,7 +188,7 @@ public function findCandidateItems(
 
 ## Example
 
-Take a look at the [`example directory`](./example) to see how this library 
+Take a look at the [`example directory`](./example) to see how this library
 can be used to extract similar Wikipedia titles.
 
 ## Tests
